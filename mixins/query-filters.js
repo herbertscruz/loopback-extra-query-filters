@@ -17,8 +17,6 @@ module.exports = class QueryFilters {
   }
 
   _item(item, scope) {
-    const original = item;
-    item = get(original, '__data', item);
     if (scope.include) {
       scope.include = this._toArrayInclude(scope.include);
       scope.include.forEach(include => {
@@ -29,13 +27,12 @@ module.exports = class QueryFilters {
     if (scope.notHas && !this._noHas(item, scope)) return;
     if (scope.isEmpty && !this._isEmpty(item, scope)) return;
     if (scope.isNotEmpty && !this._isNotEmpty(item, scope)) return;
-    if (get(original, '__data')) set(original, '__data', item);
-    return original;
+    return item;
   }
 
   _scope(item, scope) {
     const relation = get(scope, 'relation');
-    let subItem = get(item, relation);
+    let subItem = get(item, `__data.${relation}`, get(item, relation));
     if (subItem) {
       const subScope = get(scope, 'scope');
       if (subScope) {
@@ -44,7 +41,11 @@ module.exports = class QueryFilters {
         } else {
           subItem = this._item(subItem, subScope);
         }
-        set(item, relation, subItem);
+        if (get(item, `__data.${relation}`)) {
+          set(item, `__data.${relation}`, subItem);
+        } else {
+          set(item, relation, subItem);
+        }
       }
     }
     return item;
@@ -54,52 +55,52 @@ module.exports = class QueryFilters {
     if (isString(include)) {
       return [{relation: include}];
     } else if (isArray(include)) {
-      return include.map(item => {
-        if (isString(item)) {
-          item = {relation: item};
+      return include.map(relation => {
+        if (isString(relation)) {
+          relation = {relation};
         }
-        return item;
+        return relation;
       });
     } else if (isObject(include)) {
       return [include];
     }
   }
 
-  _has(data, filter) {
-    if (!(isArray(filter.has) || isString(filter.has))) {
+  _has(item, scope) {
+    if (!(isArray(scope.has) || isString(scope.has))) {
       throw '"has" filter must be a string or array of strings';
     }
-    if (isString(filter.has)) filter.has = [filter.has];
-    return has(data, filter.has);
+    if (isString(scope.has)) scope.has = [scope.has];
+    return has(get(item, '__data', item), scope.has);
   }
 
-  _noHas(data, filter) {
-    if (!(isArray(filter.notHas) || isString(filter.notHas))) {
+  _noHas(item, scope) {
+    if (!(isArray(scope.notHas) || isString(scope.notHas))) {
       throw '"notHas" filter must be a string or array of strings';
     }
-    if (isString(filter.notHas)) filter.notHas = [filter.notHas];
-    return !has(data, filter.notHas);
+    if (isString(scope.notHas)) scope.notHas = [scope.notHas];
+    return !has(get(item, '__data', item), scope.notHas);
   }
 
-  _isEmpty(data, filter) {
-    if (!(isArray(filter.isEmpty) || isString(filter.isEmpty))) {
+  _isEmpty(item, scope) {
+    if (!(isArray(scope.isEmpty) || isString(scope.isEmpty))) {
       throw '"isEmpty" filter must be a string or array of strings';
     }
-    if (isString(filter.isEmpty)) filter.isEmpty = [filter.isEmpty];
-    return filter.isEmpty.every(item => {
-      item = get(data, item);
-      return isEmpty(item);
+    if (isString(scope.isEmpty)) scope.isEmpty = [scope.isEmpty];
+    return scope.isEmpty.every(i => {
+      item = get(item, '__data', item);
+      return isEmpty(get(item, i));
     });
   }
 
-  _isNotEmpty(data, filter) {
-    if (!(isArray(filter.isNotEmpty) || isString(filter.isNotEmpty))) {
+  _isNotEmpty(item, scope) {
+    if (!(isArray(scope.isNotEmpty) || isString(scope.isNotEmpty))) {
       throw '"_isNotEmpty" filter must be a string or array of strings';
     }
-    if (isString(filter.isNotEmpty)) filter.isNotEmpty = [filter.isNotEmpty];
-    return filter.isNotEmpty.every(item => {
-      item = get(data, item);
-      return !isEmpty(item);
+    if (isString(scope.isNotEmpty)) scope.isNotEmpty = [scope.isNotEmpty];
+    return scope.isNotEmpty.every(i => {
+      item = get(item, '__data', item);
+      return !isEmpty(get(item, i));
     });
   }
 };
