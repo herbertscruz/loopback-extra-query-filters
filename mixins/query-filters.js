@@ -30,7 +30,7 @@ module.exports = class QueryFilters {
     if (scope.isEmpty && !this._isEmpty(item, scope)) return;
     if (scope.isNotEmpty && !this._isNotEmpty(item, scope)) return;
     if (get(original, '__data')) set(original, '__data', item);
-    return item;
+    return original;
   }
 
   _scope(item, scope) {
