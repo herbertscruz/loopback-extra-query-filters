@@ -106,6 +106,7 @@ module.exports = class QueryFilters {
   }
 
   clearFilter(filter) {
+    if (!filter) return;
     filter = JSON.parse(JSON.stringify(filter));
     if (filter.include) {
       if (isArray(filter.include)) {
@@ -117,6 +118,10 @@ module.exports = class QueryFilters {
           return include;
         });
       } else if (isObject(filter.include)) {
+        const scope = get(filter, 'include.scope');
+        if (scope) {
+          set(filter, 'include.scope', this.clearFilter(scope));
+        }
         filter.include = this.clearFilter(filter.include);
       }
     }
