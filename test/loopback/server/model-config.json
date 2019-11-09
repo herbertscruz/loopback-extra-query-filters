@@ -39,5 +39,11 @@
   },
   "Note": {
     "dataSource": "db"
+  },
+  "Author": {
+    "dataSource": "db"
+  },
+  "Like": {
+    "dataSource": "db"
   }
 }

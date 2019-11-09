@@ -9,6 +9,18 @@
       "type": "string"
     }
   },
+  "relations": {
+    "author": {
+      "type": "belongsTo",
+      "model": "Author",
+      "foreignKey": ""
+    },
+    "likes": {
+      "type": "hasMany",
+      "model": "Like",
+      "foreignKey": ""
+    }
+  },
   "mixins": {
     "ExtraQueryFilters" : true
   }

@@ -5,23 +5,23 @@ const request = require('supertest')(server);
 describe('mixins/extra-query-filters.js', () => {
   it('should return success', async () => {
     return request
-      .post('/api/notes')
-      .send({
-        title: 'Title Test',
-        content: 'Content Test',
+      .get('/api/notes')
+      .query({
+        filter: JSON.stringify({
+          include: ['author', {
+            relation: 'likes',
+            scope: {
+              notHas: 'test',
+              isNotEmpty: 'name',
+            },
+          }],
+          has: 'author',
+          isNotEmpty: 'likes',
+        }),
       })
+      .send()
       .then(response => {
-        return request
-          .get('/api/notes')
-          .query({
-            filter: JSON.stringify({
-              limit: 1,
-            }),
-          })
-          .send()
-          .then(response => {
-            assert.isOk(response);
-          });
+        assert.isOk(response);
       });
   });
 });

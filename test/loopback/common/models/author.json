@@ -1,0 +1,19 @@
+{
+  "name": "Author",
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "relations": {
+    "notes": {
+      "type": "hasMany",
+      "model": "Note",
+      "foreignKey": ""
+    }
+  },
+  "mixins": {
+    "ExtraQueryFilters" : true
+  }
+}

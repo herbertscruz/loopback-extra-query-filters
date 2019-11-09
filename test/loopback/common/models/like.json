@@ -1,0 +1,19 @@
+{
+  "name": "Like",
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "relations": {
+    "note": {
+      "type": "belongsTo",
+      "model": "Note",
+      "foreignKey": ""
+    }
+  },
+  "mixins": {
+    "ExtraQueryFilters" : true
+  }
+}
