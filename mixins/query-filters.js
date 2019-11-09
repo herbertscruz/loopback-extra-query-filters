@@ -17,7 +17,8 @@ module.exports = class QueryFilters {
   }
 
   _item(item, scope) {
-    item = get(item, '__data', item);
+    const original = item;
+    item = get(original, '__data', item);
     if (scope.include) {
       scope.include = this._toArrayInclude(scope.include);
       scope.include.forEach(include => {
@@ -28,6 +29,7 @@ module.exports = class QueryFilters {
     if (scope.notHas && !this._noHas(item, scope)) return;
     if (scope.isEmpty && !this._isEmpty(item, scope)) return;
     if (scope.isNotEmpty && !this._isNotEmpty(item, scope)) return;
+    if (get(original, '__data')) set(original, '__data', item);
     return item;
   }
 
