@@ -7,6 +7,7 @@ const get = require('lodash/get');
 const set = require('lodash/set');
 const has = require('lodash/has');
 const compact = require('lodash/compact');
+const omit = require('lodash/omit');
 
 module.exports = class QueryFilters {
   apply(data, filter = {}) {
@@ -102,5 +103,23 @@ module.exports = class QueryFilters {
       item = get(item, '__data', item);
       return !isEmpty(get(item, i));
     });
+  }
+
+  clearFilter(filter) {
+    filter = JSON.parse(JSON.stringify(filter));
+    if (filter.include) {
+      if (isArray(filter.include)) {
+        filter.include = filter.include.map(include => {
+          if (isString(include)) return include;
+          if (include.scope) {
+            include.scope = this.clearFilter(include.scope);
+          }
+          return include;
+        });
+      } else if (isObject(filter.include)) {
+        filter.include = this.clearFilter(filter.include);
+      }
+    }
+    return omit(filter, ['has', 'notHas', 'isEmpty', 'isNotEmpty']);
   }
 };

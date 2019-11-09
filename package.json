@@ -1,6 +1,6 @@
 {
   "name": "loopback-extra-query-filters",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Extra query filters for loopback models",
   "keywords": [
     "strongLoop",

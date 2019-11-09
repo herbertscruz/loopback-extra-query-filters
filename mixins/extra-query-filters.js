@@ -6,8 +6,9 @@ module.exports = function(Model) {
     const override = Model.find;
     Model.find = function(filter, options, cb) {
       const ps = (async () => {
-        const data = await override.apply(this, [filter, options]);
         const queryFilters = new QueryFilters();
+        const clearFilter = queryFilters.clearFilter(filter);
+        const data = await override.apply(this, [clearFilter, options]);
         return queryFilters.apply(data, filter);
       })();
       if (!cb) return ps;
